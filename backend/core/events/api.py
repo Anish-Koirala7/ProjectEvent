@@ -14,6 +14,10 @@ from rest_framework import pagination
 
 from .pagination import MyPagination
 
+from .models import Like 
+from .serializers import  LikeSer ,LikeUpdateSer
+
+
 class EventViewSet(viewsets.ModelViewSet):
     queryset = Event.objects.all()
     serializer_class = EventSer
@@ -35,3 +39,37 @@ class EventViewSet(viewsets.ModelViewSet):
         serializer = EventSer(owner_events , many = True)
         return Response(serializer.data)
 
+class LikeViewSet(viewsets.ModelViewSet):
+    queryset = Like.objects.all()
+    serializer_class = LikeSer
+    permission_classes = [
+        permissions.IsAuthenticated,
+        isOwnerOrReadOnly,
+    ]
+
+    def perform_create(self ,serializer):
+        return serializer.save(owner = self.request.user)
+
+    def create(self ,request , pk=None):
+        serializer = self.get_serializer(data = request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(owner = self.request.user)
+        event_id = serializer.data["event"]
+        event = Event.objects.get(id = event_id)
+        return Response(EventSer(event).data)
+
+    def update(self ,request , pk=None):
+        like = get_object_or_404(Like ,id = pk)
+        post = like.post
+        self.check_object_permissions(request , like)
+        serializer = LikeUpdateSer(like ,data = request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(EventSer(post).data)
+
+    def destroy(self ,request , pk=None):
+        like = get_object_or_404(Like ,id = pk)
+        post = like.post
+        self.check_object_permissions(request , like)
+        like.delete() 
+        return Response(EventSer(post).data)
