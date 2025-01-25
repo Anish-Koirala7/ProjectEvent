@@ -22,13 +22,14 @@ class EventViewSet(viewsets.ModelViewSet):
     queryset = Event.objects.all()
     serializer_class = EventSer
     permission_classes = [
-        permissions.IsAuthenticatedOrReadOnly ,
+        permissions.IsAuthenticatedOrReadOnly,
         isOwnerOrReadOnly,    
     ]
     pagination_class = MyPagination
     filter_backends = [filters.OrderingFilter]
     ordering = ['-p_date']
 
+   
     def perform_create(self ,serializer):
         serializer.save(owner = self.request.user)
 
@@ -60,7 +61,7 @@ class LikeViewSet(viewsets.ModelViewSet):
 
     def update(self ,request , pk=None):
         like = get_object_or_404(Like ,id = pk)
-        post = like.post
+        post = like.event
         self.check_object_permissions(request , like)
         serializer = LikeUpdateSer(like ,data = request.data)
         serializer.is_valid(raise_exception=True)
@@ -69,7 +70,7 @@ class LikeViewSet(viewsets.ModelViewSet):
 
     def destroy(self ,request , pk=None):
         like = get_object_or_404(Like ,id = pk)
-        post = like.post
+        post = like.event
         self.check_object_permissions(request , like)
         like.delete() 
         return Response(EventSer(post).data)

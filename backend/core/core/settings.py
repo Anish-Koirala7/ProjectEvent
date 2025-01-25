@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'events',
     'knox',
     'corsheaders',
+    'venue',
 ]
 CORS_ALLOWED_ORIGINS= ['http://localhost:5173']
 

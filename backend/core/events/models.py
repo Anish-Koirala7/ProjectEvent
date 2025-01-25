@@ -5,12 +5,14 @@ from django.db import models
 
 
 class Event(models.Model):
+    cover_img = models.ImageField(upload_to="images/events" ,blank = True)
     title = models.CharField(max_length= 112)
     content = models.TextField()
     owner = models.ForeignKey(User ,on_delete = models.CASCADE)
     p_date = models.DateTimeField( editable=False ,null = True)
     event_date = models.DateTimeField( null = True)
     u_date = models.DateTimeField( null  = True)
+
     
 
     def save(self, *args, **kwargs):
@@ -29,7 +31,7 @@ class Event(models.Model):
 
 class Like(models.Model):
     owner = models.ForeignKey(User ,on_delete = models.CASCADE,related_name='likes')
-    event = models.ForeignKey( Event ,on_delete = models.CASCADE ,related_name='likes' )
+    event = models.ForeignKey(Event ,on_delete = models.CASCADE,related_name='likes' )
     like = models.BooleanField()
     
 
