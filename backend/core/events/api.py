@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 
 from .models import Event 
 from .serializers import EventSer
-from .custom_permissions import isOwnerOrReadOnly
+from .custom_permissions import isOwnerOrReadOnly, isOrganizer
 from rest_framework import filters
 from rest_framework import pagination
 
@@ -23,13 +23,14 @@ class EventViewSet(viewsets.ModelViewSet):
     serializer_class = EventSer
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly,
-        isOwnerOrReadOnly,    
+        isOwnerOrReadOnly,
+        isOrganizer    
     ]
     pagination_class = MyPagination
     filter_backends = [filters.OrderingFilter]
     ordering = ['-p_date']
 
-   
+    # @action(detail=True,methods= 'POST',permission_classes=[isOrganizer])
     def perform_create(self ,serializer):
         serializer.save(owner = self.request.user)
 
